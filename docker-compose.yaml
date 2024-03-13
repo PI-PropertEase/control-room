@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  display_service:
+    image: display_service        # image name
+    build: 
+      context: ./DisplayService   # where to find 'dockerfile'
+      dockerfile: Dockerfile      # change if using different Dockerfile (e.g. Dockerfile-prod)
+
+  user_service:
+    image: user_service
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
