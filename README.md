@@ -56,4 +56,4 @@ http {
 
 Run the following:
 
-`git submodules update --merge --remote`
+`git submodule update --merge --remote`
