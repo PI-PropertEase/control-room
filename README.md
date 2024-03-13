@@ -2,6 +2,14 @@
 
 This repository serves as a centralized repository to deploy our application. It uses [`git submodules`](https://git-scm.com/book/en/v2/Git-Tools-Submodules) to refer to other our other repositories.
 
+After cloning, make sure to [initialize submodules](#initializing-submodules), otherwise folders will be empty.
+
+## Initializing submodules
+
+After clone this repository, you must run the following command to clone submodule repositories aswell:
+
+`git submodule update --init --recursive`
+
 ## Adding a new `git submodule` to deploy
 
 As an example, I will consider a submodule called `TestService`.
@@ -48,7 +56,6 @@ http {
         # ...
     }
 }
-
 ```
 
 
