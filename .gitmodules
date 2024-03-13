@@ -1,0 +1,6 @@
+[submodule "DisplayService"]
+	path = DisplayService
+	url = git@github.com:PI-PropertEase/DisplayService.git
+[submodule "UserService"]
+	path = UserService
+	url = git@github.com:PI-PropertEase/UserService.git
