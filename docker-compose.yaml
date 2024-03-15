@@ -5,9 +5,13 @@ services:
     build: 
       context: ./DisplayService   # where to find 'dockerfile'
       dockerfile: Dockerfile      # change if using different Dockerfile (e.g. Dockerfile-prod)
+    environment:
+      - VITE_APP_SERVER_URL=http://localhost
+    ports:
+      - 8080:8080  
+    volumes:
+      - ./DisplayService:/app
+      - pnpm_modules:/app/node_modules
 
-  user_service:
-    image: user_service
-    build:
-      context: ./UserService
-      dockerfile: Dockerfile
+volumes:
+  pnpm_modules:
