@@ -4,3 +4,6 @@
 [submodule "UserService"]
 	path = UserService
 	url = git@github.com:PI-PropertEase/UserService.git
+[submodule "ExternalServices"]
+	path = ExternalServices
+	url = git@github.com:PI-PropertEase/ExternalServices.git
