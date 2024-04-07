@@ -1,17 +1,39 @@
 version: '3.8'
 services:
-  display_service:
-    image: display_service        # image name
-    build: 
-      context: ./DisplayService   # where to find 'dockerfile'
-      dockerfile: Dockerfile      # change if using different Dockerfile (e.g. Dockerfile-prod)
-    environment:
-      - VITE_APP_SERVER_URL=http://localhost
-    ports:
-      - 8080:8080  
+  #display_service:
+  #  image: display_service        # image name
+  #  build: 
+  #    context: ./DisplayService   # where to find 'dockerfile'
+  #    dockerfile: Dockerfile      # change if using different Dockerfile (e.g. Dockerfile-prod)
+  #  environment:
+  #    - VITE_APP_SERVER_URL=http://localhost
+  #  ports:
+  #    - 8080:8080  
+  #  volumes:
+  #    - ./DisplayService:/app
+  #    - modules:/app/node_modules
+  proxy:
+    image: nginx
     volumes:
-      - ./DisplayService:/app
-      - modules:/app/node_modules
+      - type: bind
+        source: default.conf
+        target: /etc/nginx/conf.d/default.conf
+        read_only: true
+    ports: 
+      - 4040:4040
+  user_service:
+    build:
+      context: ./UserService
+      dockerfile: Dockerfile
+    ports:
+      - 8000:8000
+  user_service_db:
+    image: postgres:16.2
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+    
 
 volumes:
   modules:
