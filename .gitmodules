@@ -7,3 +7,6 @@
 [submodule "ExternalServices"]
 	path = ExternalServices
 	url = git@github.com:PI-PropertEase/ExternalServices.git
+[submodule "PropertyService"]
+	path = PropertyService
+	url = git@github.com:PI-PropertEase/PropertyService.git
