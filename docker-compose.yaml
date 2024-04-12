@@ -1,17 +1,15 @@
 version: '3.8'
 services:
-  #display_service:
-  #  image: display_service        # image name
-  #  build: 
-  #    context: ./DisplayService   # where to find 'dockerfile'
-  #    dockerfile: Dockerfile      # change if using different Dockerfile (e.g. Dockerfile-prod)
-  #  environment:
-  #    - VITE_APP_SERVER_URL=http://localhost
-  #  ports:
-  #    - 8080:8080  
-  #  volumes:
-  #    - ./DisplayService:/app
-  #    - modules:/app/node_modules
+  rabbit_mq:
+    image: rabbitmq:3.13.0-management
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 20s
+      timeout: 10s
+      retries: 20
+    networks:
+      - messageBroker
+
   proxy:
     image: nginx
     volumes:
@@ -20,28 +18,110 @@ services:
         target: /etc/nginx/conf.d/default.conf
         read_only: true
     ports: 
-      - 4040:4040
+      - 80:80
+    depends_on:
+      display_service:
+        condition: service_started
+      user_service:
+        condition: service_healthy
+      property_service:
+        condition: service_healthy
+    networks:
+      - frontend
+      - backend
+
+  user_service_db:
+    image: postgres:16.2
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - userService
+
   user_service:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 100
+      start_period: 2s
+    depends_on:
+      rabbit_mq : 
+        condition: service_healthy
+      user_service_db :
+        condition: service_healthy
     build:
       context: ./UserService
       dockerfile: Dockerfile
-    ports:
-      - 8000:8000
+    networks:
+      - userService
+      - backend
+      - messageBroker
+      
+  property_service_db:
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    image: mongo:7.0.7-rc2-jammy
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    networks:
+      - propertyService
+
+  property_service:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 100
+      start_period: 2s
     depends_on:
-      - user_service_db
-      - rabbit_mq
-  user_service_db:
-    image: postgres:16.2
-    env_file:
-      - .env
-    ports:
-      - 5432:5432
-  rabbit_mq:
-    image: rabbitmq:3.13.0-management
-    ports:
-      - 5672:5672
-      - 15672:15672
-    
+      rabbit_mq : 
+        condition: service_healthy
+      property_service_db :
+        condition: service_healthy
+    build:
+      context: ./PropertyService
+      dockerfile: Dockerfile
+    networks:
+      - propertyService
+      - backend
+      - messageBroker
+
+  display_service:
+    depends_on:
+      property_service:
+        condition: service_healthy
+      user_service:
+        condition: service_healthy
+    image: display_service        
+    build: 
+      context: ./DisplayService 
+      dockerfile: Dockerfile     
+    environment:
+      - VITE_APP_SERVER_URL=http://localhost  
+    volumes:
+      - ./DisplayService:/app
+      - modules:/app/node_modules
+    networks:
+      - frontend
 
 volumes:
   modules:
+
+networks:
+  frontend:
+  backend:
+  userService:
+  messageBroker:
+  propertyService:
