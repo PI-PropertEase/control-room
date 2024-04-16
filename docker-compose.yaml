@@ -59,6 +59,8 @@ services:
     build:
       context: ./UserService
       dockerfile: Dockerfile
+    volumes:
+      - ./UserService:/app
     networks:
       - userService
       - backend
@@ -93,6 +95,8 @@ services:
     build:
       context: ./PropertyService
       dockerfile: Dockerfile
+    volumes:
+      - ./PropertyService:/app
     networks:
       - propertyService
       - backend
