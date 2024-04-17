@@ -105,6 +105,43 @@ services:
       - backend
       - messageBroker
 
+  calendar_service_db:
+    image: postgres:16.2
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "postgres" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER_CS}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_CS}
+      POSTGRES_DB: ${POSTGRES_DB_CS}
+    networks:
+      - calendarService
+
+  calendar_service:
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 2s
+      timeout: 2s
+      retries: 100
+      start_period: 2s
+    depends_on:
+      rabbit_mq : 
+        condition: service_healthy
+      user_service_db :
+        condition: service_healthy
+    build:
+      context: ./CalendarService
+      dockerfile: Dockerfile
+    volumes:
+      - ./CalendarService:/app
+    networks:
+      - calendarService
+      - backend
+      - messageBroker
+
+
   display_service:
     depends_on:
       property_service:
@@ -132,3 +169,4 @@ networks:
   userService:
   messageBroker:
   propertyService:
+  calendarService:
