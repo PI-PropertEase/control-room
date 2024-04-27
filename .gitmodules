@@ -13,3 +13,6 @@
 [submodule "CalendarService"]
 	path = CalendarService
 	url = git@github.com:PI-PropertEase/CalendarService.git
+[submodule "AnalyticsService"]
+	path = AnalyticsService
+	url = git@github.com:PI-PropertEase/AnalyticsService.git
