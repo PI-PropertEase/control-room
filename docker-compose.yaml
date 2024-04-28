@@ -108,6 +108,8 @@ services:
         condition: service_healthy
       property_service_db :
         condition: service_healthy
+      analytics_service:
+        condition: service_started
     build:
       context: ./PropertyService
       dockerfile: Dockerfile
