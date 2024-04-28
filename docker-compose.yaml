@@ -68,6 +68,19 @@ services:
       - userService
       - backend
       - messageBroker
+
+  analytics_service:
+    depends_on:
+      rabbit_mq: 
+        condition: service_healthy
+    build: 
+      context: ./AnalyticsService
+      dockerfile: Dockerfile
+    volumes:
+      - ./AnalyticsService:/app
+    networks:
+      - analyticsService
+      - messageBroker
       
   property_service_db:
     healthcheck:
@@ -170,3 +183,4 @@ networks:
   messageBroker:
   propertyService:
   calendarService:
+  analyticsService:
