@@ -16,3 +16,6 @@
 [submodule "AnalyticsService"]
 	path = AnalyticsService
 	url = git@github.com:PI-PropertEase/AnalyticsService.git
+[submodule "WebsiteWrappers"]
+	path = WebsiteWrappers
+	url = git@github.com:PI-PropertEase/WebsiteWrappers.git
