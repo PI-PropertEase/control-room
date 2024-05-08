@@ -9,6 +9,8 @@ services:
       retries: 20
     networks:
       - messageBroker
+      - websiteWrappers
+      - analytics
     ports:
       - 15672:15672
       - 5672:5672
@@ -80,7 +82,7 @@ services:
       - ./AnalyticsService:/app
     networks:
       - analyticsService
-      - messageBroker
+      - analytics
       
   property_service_db:
     healthcheck:
@@ -174,6 +176,22 @@ services:
       - modules:/app/node_modules
     networks:
       - frontend
+  
+  website_wrappers:
+    image: website_wrappers
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+    build:
+      context: ./WebsiteWrappers
+      dockerfile: Dockerfile
+    volumes:
+      - ./WebsiteWrappers:/app
+    networks:
+      - websiteWrappers
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
 
 volumes:
   modules:
@@ -186,3 +204,5 @@ networks:
   propertyService:
   calendarService:
   analyticsService:
+  analytics:
+  websiteWrappers:
