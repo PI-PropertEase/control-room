@@ -177,14 +177,45 @@ services:
     networks:
       - frontend
   
-  website_wrappers:
-    image: website_wrappers
+  website_wrappers_zooking:
+    image: website_wrappers_zooking
     depends_on:
       rabbit_mq:
         condition: service_healthy
     build:
       context: ./WebsiteWrappers
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.zooking
+    volumes:
+      - ./WebsiteWrappers:/app
+    networks:
+      - websiteWrappers
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  website_wrappers_clickandgo:
+    image: website_wrappers_clickandgo
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+    build:
+      context: ./WebsiteWrappers
+      dockerfile: Dockerfile.clickandgo
+    volumes:
+      - ./WebsiteWrappers:/app
+    networks:
+      - websiteWrappers
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+
+  website_wrappers_earthstayin:
+    image: website_wrappers_earthstayin
+    depends_on:
+      rabbit_mq:
+        condition: service_healthy
+    build:
+      context: ./WebsiteWrappers
+      dockerfile: Dockerfile.earthstayin
     volumes:
       - ./WebsiteWrappers:/app
     networks:
